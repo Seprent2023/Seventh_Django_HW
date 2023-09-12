@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+{% extends 'flatpages/default.html' %}
+
+{% load custom_tags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        Поиск
+        {% endblock title%}
+    </title>
+</head>
+<body>
+{% block content %}
+
+    <form action="" method="get">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти" />
+    </form>
+
+<!--    <label for="meeting-time">Choose a time for your appointment:</label>-->
+
+<!--    <input-->
+<!--      type="datetime-local"-->
+<!--      id="meeting-time"-->
+<!--      name="meeting-time"-->
+<!--      value="2018-06-12T19:30"-->
+<!--      min="2018-06-07T00:00"-->
+<!--      max="2018-06-14T00:00"-->
+<!--    />-->
+
+    <hr>
+    {% if search %}
+        <table>
+            <tr>
+                <th>Заголовок</th>
+                <th>Время публикации</th>
+                <th>Превью</th>
+            </tr>
+            {% for n in search %}
+            <tr>
+                <td>{{ n.headline }}</td>
+                <td>{{ n.time_in|date:'d M Y'  }}</td>
+                <td>{{ n.preview }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>Новостей нет! Вообще нет!</h2>
+    {% endif %}
+
+    {% if page_obj.previous_page_number == 1 %}
+    <a href="?{% url_replace page=1 %}">1</a>
+    {% endif %}
+    {% if page_obj.previous_page_number != 1 %}
+    <a href="?{% url_replace page=1 %}">
+        Начало
+    </a>
+    ...
+    <a href="?page={% url_replace page=page_obj.previous_page_number %}">
+        {{ page_obj.previous_page_number }}
+    </a>
+
+    {% endif %}
+
+    {{ page_obj.number }}
+
+    {% if page_obj.has_next %}
+        <a href="?page={% url_replace page=page_obj.next_page_number %}">
+            {{ page_obj.next_page_number }}
+        </a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?page={% url_replace page=paginator.num_page %}">
+                Конец
+            </a>
+        {% endif %}
+    {% endif %}
+
+{% endblock content%}
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% extends 'flatpages/default.html' %}
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        Posts
+        {% endblock title%}
+    </title>
+</head>
+<body>
+{% block content %}
+    <h1>Все новости</h1>
+    <h3>Всего новостей: {{ posts|length }}</h3>
+    <h3> {{ next_sale|default_if_none:"Чуть позже сообщим о новостях!" }} </h3>
+
+    <hr>
+    {% if not is_author %}
+    <button>
+        <a class="nav-link" href="{% url 'account_upgrade' %}">
+            <h4><strong>Join the authors!</strong></h4>
+        </a>
+    </button>
+    {% endif %}
+    {% if posts %}
+        <table>
+            <tr>
+                <th>Заголовок</th>
+                <th>Время публикации</th>
+                <th>Превью</th>
+            </tr>
+            {% for n in posts %}
+            <tr>
+                <td>{{ n.headline }}</td>
+                <td>{{ n.time_in|date:'d M Y'  }}</td>
+                <td>{{ n.preview }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>Новостей нет! Вообще нет!</h2>
+    {% endif %}
+
+    {% if page_obj.previous_page_number == 1 %}
+    <a href="?page=1">1</a>
+    {% endif %}
+    {% if page_obj.previous_page_number != 1 %}
+    <a href="?page=1">
+        Начало
+    </a>
+    ...
+    <a href="?page={{ page_obj.previous_page_number }}">
+        {{ page_obj.previous_page_number }}
+    </a>
+
+    {% endif %}
+
+    {{ page_obj.number }}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">
+            {{ page_obj.next_page_number }}
+        </a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?page={{ paginator.num_page }}">
+                Конец
+            </a>
+        {% endif %}
+    {% endif %}
+
+{% endblock content%}
+</body>
+</html>
