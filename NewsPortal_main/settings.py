@@ -10,6 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os.path
+import logging
+# logging.basicConfig(level=logging.INFO, filename="general.log",
+#                     format="%(asctime)s %(levelname)s %(module)s %(message)s")
+
+logging.debug("DEBUG сообщение")
+logging.info("INFO сообщение")
+logging.warning("WARNING сообщение")
+logging.error("ERROR сообщение", exc_info=True)
+logging.critical("CRITICAL сообщение", exc_info=True)
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -174,3 +183,92 @@ CELERY_RESULT_BACKEND = 'redis://:3j7jZ7MYPIbyik7G2XihEOGmYCAJIlPs@redis-16242.c
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'style': '{',
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+        'general': {
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'
+        },
+        'errors': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file_gen': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'formatter': 'general',
+            'filaname': '/NewsPortal/general.log'
+        },
+        'file_err': {
+            'level': ['ERROR', 'CRITICAL'],
+            'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'formatter': 'errors',
+            'filename': '/NewsPortal/errors.log'
+        },
+        'file_security': {
+            'filters': ['require_debug_true'],
+            'class': 'logging.FileHandler',
+            'formatter': 'general',
+            'filename': '/NewsPortal/security.log'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file_gen'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['mail_admins', 'file_err'],
+            'level': ['ERROR', 'CRITICAL'],
+            'propagate': False,
+        },
+        'django_server': {
+            'handlers': ['mail_admins', 'file_err'],
+            'level': ['ERROR', 'CRITICAL'],
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['mail_admins', 'file_err'],
+            'level': ['ERROR', 'CRITICAL'],
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['mail_admins', 'file_err'],
+            'level': ['ERROR', 'CRITICAL'],
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['file_security'],
+            'propagate': False,
+        }
+    }
+}
+#  Доработать вывод в консоль, разделение по уровням. Разобраться с exc_info. Вывод сообщений WARNING
